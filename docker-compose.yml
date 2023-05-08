@@ -1,0 +1,35 @@
+version: "3.1"
+
+services:
+  #PotsgreSQL database service for local development.
+  postgres:
+    image: postgres:13.4
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+  # end of postgres
+
+  #Django Rest Api application.
+  service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: django_service
+    restart: on-failure
+    # command: >
+    # sh -c "python manage.py migrate &&
+    # python manage.py runserver 0.0.0.0:8000"
+    command: tail -F anything
+    volumes:
+      - .:/code
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    links:
+      - postgres:postgres
+    depends_on:
+      - postgres
+  # end of service

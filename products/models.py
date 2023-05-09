@@ -18,6 +18,10 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
+@receiver(post_save, sender=Product)
+def product_post_save(sender, instance, created, **kwargs):
+    app.send_task('products.tasks.synch_product_to_elastic', args=[instance.id])
+    
 
 class Order(models.Model):
     STATUS_CHOICES = (

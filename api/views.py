@@ -1,8 +1,11 @@
+import os
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
+from elasticsearch import Elasticsearch
 
 # from django_auto_prefetching import AutoPrefetchViewSetMixin
 from api.serializers import *
@@ -12,6 +15,27 @@ from products.models import *
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    @action(detail=False, methods=['get'], url_path='search')
+    def search(self, request, *args, **kwargs):
+        query = request.query_params.get('query')
+        ELASTIC_PASSWORD = os.environ.get('ELASTIC_PASSWORD', 'qwer1234')
+        es = Elasticsearch(f'http://elastic:{ELASTIC_PASSWORD}@es01:9200', verify_certs=False)
+
+        body = {
+            'query': {
+                'match_phrase_prefix': {
+                    'name': {
+                        'query': query,
+                        'max_expansions': 10
+                    }
+                }
+            }
+        }
+        results = es.search(index='products', body=body)
+        products = [hit['_source'] for hit in results['hits']['hits']]
+        serializer = self.get_serializer(products, many=True)
+        return Response(serializer.data)
 
 
 class OrderViewSet(viewsets.ModelViewSet):

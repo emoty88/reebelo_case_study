@@ -9,6 +9,8 @@ services:
       - .env
     ports:
       - "5432:5432"
+    networks:
+      - elastic
   # end of postgres
 
   #Django Rest Api application.
@@ -32,11 +34,15 @@ services:
       - postgres:postgres
     depends_on:
       - postgres
+    networks:
+      - elastic
   # end of service
 
   # Redis
   redis:
     image: "redis:latest"
+    networks:
+      - elastic
   # END OF Redis
 
   # Celery worker
@@ -50,6 +56,8 @@ services:
       - .:/code
     depends_on:
       - redis
+    networks:
+      - elastic
   # END of Celery worker
 
   # Elasticsearch, Kibana

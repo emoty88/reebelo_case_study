@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from store_backend.celery import app
 
 
 class Product(models.Model):
@@ -30,6 +31,11 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+@receiver(post_save, sender=Order)
+def order_post_save(sender, instance, created, **kwargs):
+    if created:
+        app.send_task('products.tasks.order_placed', args=[instance.id], countdown=3)
 
 
 class OrderProduct(models.Model):

@@ -38,3 +38,16 @@ services:
   redis:
     image: "redis:latest"
   # END OF Redis
+
+  # Celery worker
+  worker:
+    image: django_service
+    command: ["celery", "-A", "store_backend", "worker", "-l", "info"]
+    # command: tail -F anything
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+  # END of Celery worker

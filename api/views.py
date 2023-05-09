@@ -32,9 +32,10 @@ class OrderViewSet(viewsets.ModelViewSet):
             order_product['order'] = order.id
             order_product_serializer = OrderProductSerializer(data=order_product)
             order_product_serializer.is_valid(raise_exception=True)
-            print(order_product_serializer.validated_data)
+            # print(order_product_serializer.validated_data)
             order_product_serializer.save()
 
+        #There is a bug here, Order data updated in signal is not reflected here
         return Response(order_serializer.data, status=status.HTTP_201_CREATED)
     
 

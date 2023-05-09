@@ -23,3 +23,8 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'total', 'order_products', 'status', 'created_at', 'updated_at']
         read_only_fields = ['id', 'total', 'order_products', 'status', 'created_at', 'updated_at']
+
+
+class CartSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()

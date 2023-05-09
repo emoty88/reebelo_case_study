@@ -33,3 +33,8 @@ services:
     depends_on:
       - postgres
   # end of service
+
+  # Redis
+  redis:
+    image: "redis:latest"
+  # END OF Redis

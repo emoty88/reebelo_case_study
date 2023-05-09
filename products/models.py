@@ -25,9 +25,17 @@ class Order(models.Model):
         ("cancelled", "Cancelled"),
         ("delivered", "Delivered"),
     )
+    CARRIER_CHOICES = (
+        ("UPS", "UPS"),
+        ("USPS", "USPS"),
+        ("FedEx", "FedEx"),
+    )
     total = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="processing")
+
+    carrier = models.CharField(max_length=10, choices=STATUS_CHOICES, null=True, blank=True)
+    tracking_number = models.CharField(max_length=100, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
